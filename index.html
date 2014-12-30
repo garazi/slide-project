@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="handlebars-v2.0.0.js"></script>
+    <style>
+    body {
+        font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+        font-size: 100%;
+    }
+    .slidewrapper {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        overflow: hidden;
+    }
+    .slidewrapper > header {
+        width: 100%;
+        height: 5%;
+        background-color: #373737;
+    }
+    .slidewrapper footer {
+        width: 100%;
+        height: 5%;
+        border-bottom: 10px solid #373737;
+        position: absolute;
+        bottom: 0;
+    }
+    .slidewrapper footer .colorBar {
+        position: absolute;
+        bottom: 5px;
+        height: 20%;
+        left: 0;
+        right: 0;
+    }
+    .slidewrapper footer .colorBar b {
+        width: 16.666666667%;
+        height: 100%;
+        display: inline-block;
+        background-color: #FB3A18;
+    }
+    .slidewrapper footer .colorBar b:nth-of-type(2) {
+        width: 16.666666667%;
+        height: 100%;
+        display: inline-block;
+        background-color: #739BAC;
+    }
+    .slidewrapper footer .colorBar b:nth-of-type(3) {
+        width: 16.666666667%;
+        height: 100%;
+        display: inline-block;
+        background-color: #6AA970;
+    }
+    .slidewrapper footer .colorBar b:nth-of-type(4) {
+        width: 16.666666667%;
+        height: 100%;
+        display: inline-block;
+        background-color: #5B3256;
+    }
+    .slidewrapper footer .colorBar b:nth-of-type(5) {
+        width: 16.666666667%;
+        height: 100%;
+        display: inline-block;
+        background-color: #6AA970;
+    }
+    .slidewrapper footer .colorBar b:nth-of-type(6) {
+        width: 16.666666667%;
+        height: 100%;
+        display: inline-block;
+        background-color: #5C5D60;
+    }
+    section {
+        position: absolute;
+        top: 5%;
+        bottom: 2%;
+        right: 0;
+        left: 0;
+        padding: 2%;
+    }
+    h1 {
+        font-weight: 300;
+        color: #FF4300;
+        font-size: 3em;
+        position: relative;
+        text-indent: 1.5em;
+    }
+    h1:before {
+        content: "";
+        position: absolute;
+        left: -2.1%;
+        top: 8%;
+        height: 1em;
+        width: 1.5em;
+        background-color: #484848;
+        border-right: 2px solid #FF4300;
+    }
+    .content {
+        font-size: 1.5em;
+        padding: 0 3em;
+    }
+    .content ul {
+        padding: 0;
+    }
+    .content ul ul {
+        padding: 0 1.5em;
+    }
+    .hide {
+        opacity: 0;
+        transition: opacity .5s linear;
+    }
+    .show {
+        opacity: 100;
+        transition: opacity .5s linear;
+    }
+    .centerStage {
+        display: block;
+        transition: transform 1.0s ease-in-out;
+    }
+    .stageRight {
+        transform: translateX(100%);
+        transition: transform 1.0s ease-in-out;
+    }
+    .stageLeft {
+        transform: translateX(-100%);
+        transition: transform 1.0s ease-in-out;
+    }
+    </style>
+    <script>
+    document.onkeydown = function(e) {
+        console.log(e.keyCode);
+        switch (e.keyCode) {
+            case 37:
+                msg = 'backward';
+                sendIt(msg);
+                break;
+            case 39:
+                msg = 'forward';
+                sendIt(msg);
+                break;
+        }
+    };
+
+    function sendIt(msg) {
+        if (msg == 'forward') {
+            var counter = $('.centerStage .hide').length;
+            if (counter > 0) {
+                var reveal = $('.centerStage .hide').get(0);
+                $(reveal).removeClass('hide').addClass('show');
+            } else {
+                $('.centerStage').removeClass('centerStage').addClass('stageLeft');
+                var foo = $('.stageRight').get(0);
+                $(foo).removeClass('stageRight').addClass('centerStage');
+            }
+
+        } else {
+            var count = $('.stageLeft');
+            var foo = $('.stageLeft:last');
+            if (count.length >= 1) {
+                $('.centerStage').removeClass('centerStage').addClass('stageRight');
+                $(foo).removeClass('stageLeft').addClass('centerStage');
+            }
+        }
+    }
+    $(function() {
+        $('.content').find('p, li').addClass('hide');
+
+        var slide = {
+            template: "standardSlide",
+            header: "This is the first slide",
+            text: ["A simple sentance to explain the slide", "What happens if we have two paragraphs?"],
+            listitems: [{
+                bullet: "A bullet point"
+            }, {
+                bullet: "Another bullet point"
+            }, {
+                bullet: "And the final point is here",
+                sub: [{
+                    bullet: "A test"
+                }, {
+                    bullet: "foo"
+                }]
+            }]
+        }
+        var source = $('#standardSlide').html();
+        var template = Handlebars.compile(source);
+        $('section:first').html(template(slide));
+    })
+
+    // TO DO
+    // add a preview/presenter page
+    </script>
+    <script id="standardSlide" type="text/x-handlebars-template">
+        <header>
+            <h1>{{header}}</h1>
+        </header>
+        <div class="content">
+            {{#if text}} {{#each text}}
+            <p class="hide">{{this}}</p>
+            {{/each}} {{/if}}
+            <ul>{{#each listitems}} {{#if this.sub}}
+                <li class="hide">{{this.bullet}}
+                    <ul>
+                        {{#each this.sub}}
+                        <li class="hide">{{this.bullet}}</li>
+                        {{/each}}
+                    </ul>
+                </li>
+                {{else}}
+                <li class="hide">{{this.bullet}}</li>
+                {{/if}} {{/each}}
+            </ul>
+        </div>
+    </script>
+</head>
+
+<body>
+    <div class="slidewrapper">
+        <header></header>
+        <section class="centerStage">
+            <!-- slide content goes here -->
+        </section>
+        <section class="stageRight">
+            <header>
+                <h1>This is another header</h1>
+            </header>
+            <div class="content">
+                <p>This is some more content</p>
+            </div>
+        </section>
+        <section class="stageRight">
+            <header>
+                <h1>This is a third header</h1>
+            </header>
+            <div class="content">
+                <p>This is some more content that doesn't say anything.</p>
+            </div>
+        </section>
+        <footer>
+            <div class="colorBar"><b></b><b></b><b></b><b></b><b></b><b></b>
+            </div>
+        </footer>
+    </div>
+</body>
+
+</html>
